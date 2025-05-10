@@ -41,8 +41,23 @@ opportunity_report.txt
 needs_response_emails.json
 categorized_emails.json
 response_history.json
-token_cache.json
+token.json
+
+# Email data files (generated outputs)
+recent_emails.txt
+emails.txt
+needs_response_report.md
+needs_response_emails.json
+all_analyzed_emails.json
+categorized_emails.json
+opportunity_report.txt
+response_history.json
+deletion_candidates.json
+deletion_plan_report.txt
+categorization_report.txt
+categorized_emails_general.json
+cline/
 
 # OS files
 .DS_Store
-Thumbs.db 
+Thumbs.db
