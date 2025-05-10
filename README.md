@@ -1,6 +1,8 @@
-# 📧 AI-Powered Email Management Suite for Gmail
+# HelixMail
 
-This project provides a suite of Python scripts to help manage your Gmail inbox using AI-powered analysis and automation. It leverages OpenAI's GPT models for tasks like identifying important emails, categorizing messages, and assisting with cleanup, while using the Gmail API for direct inbox interaction.
+![HelixMail Logo](logo.png)
+
+HelixMail is an email management suite for Gmail. It provides a suite of Python scripts to help manage your Gmail inbox using AI-powered analysis and automation. It leverages OpenAI's GPT models for tasks like identifying important emails, categorizing messages, and assisting with cleanup, while using the Gmail API for direct inbox interaction.
 
 A new **unified command-line interface (`cli.py`)** is now available to provide a guided, Q&A style experience for accessing the suite's functionalities.
 
@@ -243,6 +245,6 @@ This project is licensed under the MIT License - see the LICENSE file for detail
 
 ## 🙏 Acknowledgements
 
-*   Original project structure by AllAboutAI-YT.
-*   OpenAI for providing the GPT models.
-*   Google for the Gmail API.
+*   🙏 Based on a tutorial by AllAboutAI-YT.
+*   🙏 OpenAI for providing the GPT models.
+*   🙏 Google for the Gmail API.
