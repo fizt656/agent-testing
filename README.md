@@ -139,6 +139,69 @@ The `cli.py` script requests a comprehensive set of scopes to cover all function
     # etc.
     ```
 
+## 🚀 Recommended Workflow for First-Time Use (and Beyond!)
+
+If you're new to this suite or have a large number of emails to manage, here's a suggested approach using the unified `python cli.py` assistant:
+
+### Phase 1: Initial Inbox Taming
+
+The goal here is to quickly reduce noise and tackle the backlog.
+
+1.  **Optional Fresh Start: Archive Old Unread Emails**
+    *   **Action:** Choose option `6. Archive all unread emails (Inbox Zero)` from the `cli.py` menu.
+    *   **Purpose:** If you have many old, unread emails, this moves them to an 'Old Stuff' folder, giving you a cleaner immediate view.
+    *   **Note:** Be sure you're comfortable with this bulk action.
+
+2.  **Major Cleanup: Plan and Execute**
+    *   **Action (Plan):** Choose option `4. Plan email cleanup`.
+        *   When prompted, consider a **long lookback period** (e.g., emails older than 90, 180, or even 365 days).
+        *   Process a **larger batch of emails** (e.g., 200-500).
+    *   **Review:** Carefully check the generated `deletion_plan_report.txt`.
+    *   **Action (Execute):** Choose option `5. Execute email cleanup`.
+        *   Interactively unsubscribe from unwanted senders and delete emails based on the plan. This is key to reducing future clutter.
+
+3.  **Triage Recent Important Communications**
+    *   **Action:** Choose option `1. Triage important emails`.
+        *   Use a shorter lookback (e.g., last 7-30 days).
+        *   Decide if you want to include read emails.
+    *   **Review:** Check the `needs_response_report.md`.
+    *   **Action (Optional):** If urgent items are found, use option `3. Draft replies to important emails`.
+
+### Phase 2: Organizing and Setting Up Automation
+
+With the major clutter reduced, let's organize what's left and prepare for the future.
+
+4.  **Categorize and Label Recent Emails**
+    *   **Action:** Choose option `7. General categorization & labeling of recent emails`.
+    *   **Purpose:** Applies labels like "Work," "Personal," etc., to your recent emails, helping with organization.
+
+5.  **Automate Future Organization: Set Up Filters**
+    *   **Action:** Choose option `8. Manage Gmail filters`.
+    *   **Purpose:** Creates Gmail filters to automatically handle and label new incoming emails.
+    *   **Note:** Review and customize the filter definitions in `email_manage_filters.py` beforehand for best results. You might be prompted to re-authenticate if this is the first time granting filter management permissions.
+
+### Phase 3: Specialized and Ongoing Management
+
+6.  **Find Business Opportunities (If Applicable)**
+    *   **Action:** Choose option `2. Categorize business opportunities`.
+    *   **Purpose:** If you receive business-related inquiries, run this periodically.
+
+### Ongoing Regular Workflow
+
+*   **Daily/Regularly:**
+    *   `1. Triage important emails` (short lookback, e.g., 24-48 hours).
+    *   `3. Draft replies to important emails`.
+*   **Periodically (e.g., Weekly/Monthly):**
+    *   `4. Plan email cleanup` & `5. Execute email cleanup` (moderate lookback).
+    *   `7. General categorization & labeling of recent emails`.
+    *   Review/update filters via `8. Manage Gmail filters` as needed.
+
+### Key Considerations
+
+*   **Review AI Suggestions:** Always double-check AI-generated suggestions, especially for deletions or important categorizations.
+*   **Customization:** Advanced users can modify constants and AI prompts within the individual Python scripts for tailored behavior.
+*   **Authentication:** The `cli.py` and `email_utils.py` aim to handle authentication scopes smoothly, but re-authentication might occasionally be needed if new permissions are required by a specific module.
+
 ## ⚙️ Configuration
 
 *   **API Keys:** `OPENAI_API_KEY` in `.env`.
