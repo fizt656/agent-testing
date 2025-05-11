@@ -27,7 +27,7 @@ CREDENTIALS_FILE = os.path.join(SCRIPT_DIR, "credentials.json")
 # File paths - make them SCRIPT_DIR relative
 EMAILS_FILE = os.path.join(SCRIPT_DIR, "emails.txt")
 CATEGORIZED_EMAILS_JSON = os.path.join(SCRIPT_DIR, "categorized_emails.json")
-OPPORTUNITY_REPORT = os.path.join(SCRIPT_DIR, "opportunity_report.txt")
+OPPORTUNITY_REPORT = os.path.join(SCRIPT_DIR, "opportunity_report.md") # Changed to .md
 
 
 class EmailAnalysis(BaseModel):
@@ -51,7 +51,7 @@ def get_emails(service, hours=72): # Added service parameter
 
     emails_data = []
     query_date = (datetime.now() - timedelta(hours=hours)).strftime('%Y/%m/%d')
-    query = f'after:{query_date} category:primary' 
+    query = f'after:{query_date} in:INBOX -in:spam -in:trash' # Changed category:primary to in:INBOX and added exclusions
 
     try:
         response = service.users().messages().list(userId='me', q=query, maxResults=50).execute() 
@@ -100,15 +100,15 @@ def get_emails(service, hours=72): # Added service parameter
 
                 f_out.write(f"Subject: {subject}\nFrom: {from_sender}\nReceived: {received_date}\nBody: {body_content.strip()}\n" + "-" * 50 + "\n")
                 
-        print(f"{TermColors.STATUS_INFO}Fetched {len(emails_data)} emails from the last {hours} hours into {EMAILS_FILE}.{TermColors.RESET}")
+        print(f"{TermColors.STATUS_INFO}Fetched {len(emails_data)} emails from the last {hours} hours into {os.path.basename(EMAILS_FILE)} (in the project directory).{TermColors.RESET}")
         if not emails_data:
             with open(EMAILS_FILE, 'w', encoding='utf-8') as f_empty: f_empty.write("")
-            print(f"{TermColors.YELLOW}{EMAILS_FILE} is empty as no new emails were found.{TermColors.RESET}")
+            print(f"{TermColors.YELLOW}{os.path.basename(EMAILS_FILE)} (in the project directory) is empty as no new emails were found.{TermColors.RESET}")
 
     except HttpError as error:
         print(f"{TermColors.STATUS_ERROR}An error occurred fetching emails: {error}{TermColors.RESET}")
         with open(EMAILS_FILE, 'w', encoding='utf-8') as f_err: f_err.write("")
-        print(f"{TermColors.YELLOW}{EMAILS_FILE} is empty due to an error.{TermColors.RESET}")
+        print(f"{TermColors.YELLOW}{os.path.basename(EMAILS_FILE)} (in the project directory) is empty due to an error.{TermColors.RESET}")
     return emails_data
 
 def read_emails():
@@ -227,7 +227,7 @@ def run_opportunity_categorization_step1(gmail_service, openai_client): # Rename
     print(f"{TermColors.SUMMARY_KEY}Sponsorship requests:{TermColors.RESET} {TermColors.SUMMARY_VALUE}{len(sponsorship_emails)}{TermColors.RESET}")
     print(f"{TermColors.SUMMARY_KEY}Business inquiries:{TermColors.RESET} {TermColors.SUMMARY_VALUE}{len(business_emails)}{TermColors.RESET}")
     print(f"{TermColors.SUMMARY_KEY}Other emails:{TermColors.RESET} {TermColors.SUMMARY_VALUE}{len(other_emails)}{TermColors.RESET}")
-    print(f"\n{TermColors.STATUS_INFO}Detailed results saved to: {CATEGORIZED_EMAILS_JSON}{TermColors.RESET}")
+    print(f"\n{TermColors.STATUS_INFO}Detailed results saved to: {os.path.basename(CATEGORIZED_EMAILS_JSON)} (in the project directory){TermColors.RESET}")
     
     print(f"\n{TermColors.SUMMARY_HEADER}High Confidence Business/Sponsorship Emails (>0.8):{TermColors.RESET}")
     for email in sponsorship_emails + business_emails:
@@ -289,8 +289,8 @@ def run_opportunity_categorization_step2(openai_client, categorized_emails_path=
         print(report_content)
         
         with open(OPPORTUNITY_REPORT, "w", encoding="utf-8") as f:
-            f.write("BUSINESS AND SPONSORSHIP OPPORTUNITY REPORT\n" + "="*50 + "\n\n" + report_content)
-        print(f"\n{TermColors.STATUS_SUCCESS}Report saved to {OPPORTUNITY_REPORT}{TermColors.RESET}")
+            f.write(f"# BUSINESS AND SPONSORSHIP OPPORTUNITY REPORT\n\n{report_content}")
+        print(f"\n{TermColors.STATUS_SUCCESS}Report saved to {os.path.basename(OPPORTUNITY_REPORT)} (in the project directory){TermColors.RESET}")
             
     except FileNotFoundError:
         print(f"{TermColors.STATUS_ERROR}Error: File {categorized_emails_path} not found. Please run sort_emails() first.{TermColors.RESET}")

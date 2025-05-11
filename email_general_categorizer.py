@@ -55,7 +55,7 @@ FETCH_TIMEFRAME_HOURS = 24
 MAX_EMAILS_TO_PROCESS = 100 # Increased default slightly
 
 # Report file
-CATEGORIZATION_REPORT_FILE = os.path.join(SCRIPT_DIR, "categorization_report.txt")
+CATEGORIZATION_REPORT_FILE = os.path.join(SCRIPT_DIR, "categorization_report.md") # Changed to .md
 CATEGORIZED_EMAILS_JSON_FILE = os.path.join(SCRIPT_DIR, "categorized_emails_general.json")
 
 
@@ -329,41 +329,43 @@ def generate_categorization_reports(categorized_emails: List[EmailCategorization
         count = len(categorized_groups[category])
         print(f"- {TermColors.CYAN}{category}{TermColors.RESET}: {TermColors.SUMMARY_VALUE}{count}{TermColors.RESET}")
 
-    # Text File Report
+    # Markdown File Report
     with open(CATEGORIZATION_REPORT_FILE, "w", encoding="utf-8") as f:
-        f.write("--- Email Categorization Report ---\n")
-        f.write(f"Generated on: {datetime.now().isoformat()}\n\n")
-        f.write("--- Executive Summary ---\n")
-        f.write(f"Total Emails Analyzed: {len(categorized_emails)}\n\n")
-        f.write("Breakdown by Category:\n")
+        f.write("# Email Categorization Report\n\n")
+        f.write(f"_Generated on: {datetime.now().isoformat()}_\n\n")
+        f.write("## Executive Summary\n\n")
+        f.write(f"- **Total Emails Analyzed:** {len(categorized_emails)}\n\n")
+        f.write("### Breakdown by Category:\n")
         for category in categories:
             count = len(categorized_groups[category])
-            f.write(f"- {category}: {count}\n")
+            f.write(f"- **{category}:** {count}\n")
         f.write("\n")
 
-        f.write("\n--- Detailed Categorization ---\n")
+        f.write("## Detailed Categorization\n")
         for category in categories:
             emails_in_category = categorized_groups[category]
+            f.write(f"\n### Category: {category} ({len(emails_in_category)} emails)\n\n")
             if emails_in_category:
-                f.write(f"\n--- Category: {category} ({len(emails_in_category)} emails) ---\n")
                 for email in emails_in_category:
-                    f.write(f"Subject: {email.subject}\nFrom: {email.sender}\nDate: {email.received_date}\n")
-                    f.write(f"Reason: {email.reason}\n")
-                    if email.confidence is not None: f.write(f"Confidence: {email.confidence:.2f}\n")
-                    f.write(f"Email ID: {email.email_id}\n")
-                    f.write("-" * 30 + "\n")
+                    f.write(f"#### Subject: {email.subject}\n") # Using H4 for individual email subjects
+                    f.write(f"- **From:** {email.sender}\n")
+                    f.write(f"- **Date:** {email.received_date}\n")
+                    f.write(f"- **Reason:** {email.reason}\n")
+                    if email.confidence is not None:
+                        f.write(f"- **Confidence:** {email.confidence:.2f}\n")
+                    f.write(f"- **Email ID:** `{email.email_id}`\n\n")
+                    # f.write("---\n\n") # Optional: separator between emails, might be too much with H4
             else:
-                 f.write(f"\n--- Category: {category} (0 emails) ---\n")
-                 f.write("No emails in this category.\n")
-                 f.write("-" * 30 + "\n")
+                 f.write("No emails in this category.\n\n")
+            f.write("---\n\n") # Separator between categories
 
-    print(f"\n{TermColors.STATUS_SUCCESS}Categorization report saved to: {CATEGORIZATION_REPORT_FILE}{TermColors.RESET}")
+    print(f"\n{TermColors.STATUS_SUCCESS}Categorization report saved to: {os.path.basename(CATEGORIZATION_REPORT_FILE)} (in the project directory){TermColors.RESET}")
 
     # Save categorized emails to JSON
     categorized_emails_for_json = [email.model_dump() for email in categorized_emails]
     with open(CATEGORIZED_EMAILS_JSON_FILE, "w", encoding="utf-8") as f_json:
         json.dump(categorized_emails_for_json, f_json, indent=2)
-    print(f"{TermColors.STATUS_SUCCESS}Categorized emails saved to JSON: {CATEGORIZED_EMAILS_JSON_FILE}{TermColors.RESET}")
+    print(f"{TermColors.STATUS_SUCCESS}Categorized emails saved to JSON: {os.path.basename(CATEGORIZED_EMAILS_JSON_FILE)} (in the project directory){TermColors.RESET}")
 
 
 if __name__ == "__main__":

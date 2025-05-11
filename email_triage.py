@@ -325,7 +325,7 @@ def run_triage(gmail_service, openai_client): # Renamed and added parameters
         include_read = True
 
     # Construct the query based on user input
-    email_query_parts = ['category:primary'] # Always include primary category
+    email_query_parts = ['in:INBOX', '-in:spam', '-in:trash'] # Changed to in:INBOX and added exclusions
     if not include_read:
         email_query_parts.append('is:unread') # Add is:unread only if needed
     email_query = ' '.join(email_query_parts)
@@ -369,7 +369,7 @@ def run_triage(gmail_service, openai_client): # Renamed and added parameters
     # Let's create a new JSON for ALL analyzed emails.
     ALL_ANALYZED_JSON = os.path.join(SCRIPT_DIR, "all_analyzed_emails.json")
     with open(ALL_ANALYZED_JSON, "w", encoding="utf-8") as f: json.dump(output_data, f, indent=2)
-    print(f"\n{TermColors.STATUS_INFO}All analyzed emails saved to: {ALL_ANALYZED_JSON}{TermColors.RESET}")
+    print(f"\n{TermColors.STATUS_INFO}All analyzed emails saved to: {os.path.basename(ALL_ANALYZED_JSON)} (in the project directory){TermColors.RESET}")
 
 
     # Filter for emails needing response for the original JSON and report summary
@@ -381,7 +381,7 @@ def run_triage(gmail_service, openai_client): # Renamed and added parameters
     # Update NEEDS_RESPONSE_JSON for compatibility with email_draft_reply.py
     needs_response_output_data = {"last_updated": datetime.now().isoformat(), "needs_response_emails": needs_response_emails}
     with open(NEEDS_RESPONSE_JSON, "w", encoding="utf-8") as f: json.dump(needs_response_output_data, f, indent=2)
-    print(f"{TermColors.STATUS_INFO}Emails requiring response (for drafting) saved to: {NEEDS_RESPONSE_JSON}{TermColors.RESET}")
+    print(f"{TermColors.STATUS_INFO}Emails requiring response (for drafting) saved to: {os.path.basename(NEEDS_RESPONSE_JSON)} (in the project directory){TermColors.RESET}")
 
 
     print(f"\n{TermColors.SUMMARY_KEY}Processed {len(emails)} emails from the last {scan_hours} hours.{TermColors.RESET}") # Use scan_hours
@@ -390,7 +390,7 @@ def run_triage(gmail_service, openai_client): # Renamed and added parameters
     print(f"{TermColors.SUMMARY_KEY}Previously responded to:{TermColors.RESET} {TermColors.SUMMARY_VALUE}{already_responded_count}{TermColors.RESET}")
     print(f"{TermColors.SUMMARY_KEY}Total emails analyzed:{TermColors.RESET} {TermColors.SUMMARY_VALUE}{len(all_analyzed_emails)}{TermColors.RESET}") # Report total analyzed
     
-    print(f"\n{TermColors.STATUS_INFO}Detailed results saved to: {NEEDS_RESPONSE_JSON} and {ALL_ANALYZED_JSON}{TermColors.RESET}")
+    print(f"\n{TermColors.STATUS_INFO}Detailed results saved to: {os.path.basename(NEEDS_RESPONSE_JSON)} and {os.path.basename(ALL_ANALYZED_JSON)} (in the project directory){TermColors.RESET}")
     
     # Generate Markdown Report for ALL analyzed emails
     with open(NEEDS_RESPONSE_REPORT, "w", encoding="utf-8") as f:
@@ -488,7 +488,7 @@ def run_triage(gmail_service, openai_client): # Renamed and added parameters
             print(f"Reason: {email['analysis']['reason']}\n" + "-" * 50)
     else: print(f"\n{TermColors.YELLOW}No emails were analyzed.{TermColors.RESET}")
     
-    print(f"\n{TermColors.STATUS_INFO}Full report available in {NEEDS_RESPONSE_REPORT}{TermColors.RESET}")
+    print(f"\n{TermColors.STATUS_INFO}Full report available in {os.path.basename(NEEDS_RESPONSE_REPORT)} (in the project directory){TermColors.RESET}")
 
 if __name__ == "__main__":
     print(f"{TermColors.BOLD}Running Email Triage Standalone...{TermColors.RESET}")

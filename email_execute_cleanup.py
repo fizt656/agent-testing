@@ -120,9 +120,9 @@ def run_cleanup_execution(gmail_service): # Renamed and added parameter
     log_action("Executor script started.")
 
     if not os.path.exists(DELETION_CANDIDATES_JSON_FILE):
-        print(f"{TermColors.RED}ERROR: Deletion plan file not found: {DELETION_CANDIDATES_JSON_FILE}{TermColors.RESET}")
+        print(f"{TermColors.RED}ERROR: Deletion plan file not found: {os.path.basename(DELETION_CANDIDATES_JSON_FILE)} (expected in project directory){TermColors.RESET}")
         print(f"Please run the planner script ({TermColors.CYAN}email_plan_cleanup.py{TermColors.RESET}) first.")
-        log_action(f"CRITICAL: {DELETION_CANDIDATES_JSON_FILE} not found. Exiting.")
+        log_action(f"CRITICAL: {os.path.basename(DELETION_CANDIDATES_JSON_FILE)} not found. Exiting.")
         return
 
     with open(DELETION_CANDIDATES_JSON_FILE, "r", encoding="utf-8") as f:

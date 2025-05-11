@@ -20,7 +20,7 @@ TOKEN_FILE = os.path.join(SCRIPT_DIR, "token.json")
 CREDENTIALS_FILE = os.path.join(SCRIPT_DIR, "credentials.json")
 
 # File paths - make them SCRIPT_DIR relative
-NEEDS_RESPONSE_REPORT_FILE = os.path.join(SCRIPT_DIR, "needs_response_report.txt")
+NEEDS_RESPONSE_REPORT_FILE = os.path.join(SCRIPT_DIR, "needs_response_report.md") # Corrected to .md
 RESPONSE_HISTORY_FILE = os.path.join(SCRIPT_DIR, "response_history.json")
 
 def extract_emails_from_report(report_path=NEEDS_RESPONSE_REPORT_FILE): # Use updated constant
@@ -65,7 +65,7 @@ def extract_emails_from_report(report_path=NEEDS_RESPONSE_REPORT_FILE): # Use up
         return emails
     
     except FileNotFoundError:
-        print(f"{TermColors.STATUS_ERROR}Error: File {report_path} not found.{TermColors.RESET}")
+        print(f"{TermColors.STATUS_ERROR}Error: File {os.path.basename(report_path)} (expected in project directory) not found.{TermColors.RESET}")
         return []
     except Exception as e:
         print(f"{TermColors.STATUS_ERROR}Error extracting emails from report: {e}{TermColors.RESET}")

@@ -33,7 +33,7 @@ TOKEN_FILE = os.path.join(SCRIPT_DIR, "token.json")
 CREDENTIALS_FILE = os.path.join(SCRIPT_DIR, "credentials.json") # Ensure this is present
 
 # Report file
-DELETION_PLAN_REPORT_FILE = os.path.join(SCRIPT_DIR, "deletion_plan_report.txt")
+DELETION_PLAN_REPORT_FILE = os.path.join(SCRIPT_DIR, "deletion_plan_report.md") # Changed to .md
 DELETION_CANDIDATES_JSON_FILE = os.path.join(SCRIPT_DIR, "deletion_candidates.json")
 
 
@@ -210,44 +210,64 @@ def generate_deletion_plan_reports(deletion_suggestions: List[EmailDeletionSugge
         for reason, count in reason_summary.items():
             print(f"- {TermColors.CYAN}{reason}{TermColors.RESET}: {TermColors.SUMMARY_VALUE}{count}{TermColors.RESET}")
 
-    # Text File Report (remains uncolored for simplicity of the file content)
+    # Markdown File Report
     with open(DELETION_PLAN_REPORT_FILE, "w", encoding="utf-8") as f:
-        f.write("--- Email Deletion Plan Report ---\n")
-        f.write(f"Generated on: {datetime.now().isoformat()}\n\n")
-        f.write("--- Executive Summary ---\n")
-        f.write(f"Total Emails Analyzed: {len(deletion_suggestions)}\n")
-        f.write(f"Strong Deletion Candidates: {len(strong_candidates)}\n")
-        f.write(f"Possible Deletion Candidates: {len(possible_candidates)}\n\n")
+        f.write("# Email Deletion Plan Report\n\n")
+        f.write(f"_Generated on: {datetime.now().isoformat()}_\n\n")
+        f.write("## Executive Summary\n\n")
+        f.write(f"- **Total Emails Analyzed:** {len(deletion_suggestions)}\n")
+        f.write(f"- **Strong Deletion Candidates:** {len(strong_candidates)}\n")
+        f.write(f"- **Possible Deletion Candidates:** {len(possible_candidates)}\n\n")
+        
         if reason_summary:
-            f.write("Breakdown of Strong Candidates by Reason:\n")
-            for reason, count in reason_summary.items(): f.write(f"- {reason}: {count}\n")
+            f.write("### Breakdown of Strong Candidates by Reason:\n")
+            for reason, count in reason_summary.items():
+                f.write(f"- **{reason}:** {count}\n")
             f.write("\n")
-        f.write("\n--- Strong Deletion Candidates ---\n")
+        
+        f.write("## Strong Deletion Candidates\n\n")
         if strong_candidates:
             for s in strong_candidates:
-                f.write(f"Subject: {s.subject}\nFrom: {s.sender}\nDate: {s.received_date}\n")
-                f.write(f"Reason Category: {s.reason_category}\nDetail: {s.reason_detail}\n")
-                if s.ai_confidence is not None: f.write(f"AI Confidence: {s.ai_confidence:.2f}\n")
-                if s.list_unsubscribe_mailto: f.write(f"Unsubscribe Mailto: {s.list_unsubscribe_mailto}\n")
-                if s.list_unsubscribe_http: f.write(f"Unsubscribe HTTP: {s.list_unsubscribe_http}\n")
-                f.write(f"Email ID: {s.email_id}\n" + "-" * 30 + "\n")
-        else: f.write("No strong candidates identified.\n")
-        f.write("\n--- Possible Deletion Candidates ---\n")
+                f.write(f"### Subject: {s.subject}\n\n")
+                f.write(f"- **From:** {s.sender}\n")
+                f.write(f"- **Date:** {s.received_date}\n")
+                f.write(f"- **Reason Category:** {s.reason_category}\n")
+                f.write(f"- **Detail:** {s.reason_detail}\n")
+                if s.ai_confidence is not None:
+                    f.write(f"- **AI Confidence:** {s.ai_confidence:.2f}\n")
+                if s.list_unsubscribe_mailto:
+                    f.write(f"- **Unsubscribe Mailto:** `{s.list_unsubscribe_mailto}`\n")
+                if s.list_unsubscribe_http:
+                    f.write(f"- **Unsubscribe HTTP:** [{s.list_unsubscribe_http}]({s.list_unsubscribe_http})\n")
+                f.write(f"- **Email ID:** `{s.email_id}`\n\n")
+                f.write("---\n\n")
+        else:
+            f.write("No strong candidates identified.\n\n")
+        
+        f.write("## Possible Deletion Candidates\n\n")
         if possible_candidates:
             for s in possible_candidates:
-                f.write(f"Subject: {s.subject}\nFrom: {s.sender}\nDate: {s.received_date}\n")
-                f.write(f"Reason Category: {s.reason_category}\nDetail: {s.reason_detail}\n")
-                if s.ai_confidence is not None: f.write(f"AI Confidence: {s.ai_confidence:.2f}\n")
-                if s.list_unsubscribe_mailto: f.write(f"Unsubscribe Mailto: {s.list_unsubscribe_mailto}\n")
-                if s.list_unsubscribe_http: f.write(f"Unsubscribe HTTP: {s.list_unsubscribe_http}\n")
-                f.write(f"Email ID: {s.email_id}\n" + "-" * 30 + "\n")
-        else: f.write("No possible candidates identified.\n")
+                f.write(f"### Subject: {s.subject}\n\n")
+                f.write(f"- **From:** {s.sender}\n")
+                f.write(f"- **Date:** {s.received_date}\n")
+                f.write(f"- **Reason Category:** {s.reason_category}\n")
+                f.write(f"- **Detail:** {s.reason_detail}\n")
+                if s.ai_confidence is not None:
+                    f.write(f"- **AI Confidence:** {s.ai_confidence:.2f}\n")
+                if s.list_unsubscribe_mailto:
+                    f.write(f"- **Unsubscribe Mailto:** `{s.list_unsubscribe_mailto}`\n")
+                if s.list_unsubscribe_http:
+                    f.write(f"- **Unsubscribe HTTP:** [{s.list_unsubscribe_http}]({s.list_unsubscribe_http})\n")
+                f.write(f"- **Email ID:** `{s.email_id}`\n\n")
+                f.write("---\n\n")
+        else:
+            f.write("No possible candidates identified.\n\n")
             
-    print(f"\n{TermColors.STATUS_SUCCESS}Detailed deletion plan report saved to: {DELETION_PLAN_REPORT_FILE}{TermColors.RESET}")
+    print(f"\n{TermColors.STATUS_SUCCESS}Detailed deletion plan report saved to: {os.path.basename(DELETION_PLAN_REPORT_FILE)} (in the project directory){TermColors.RESET}")
     candidates_for_json = {"strong_candidates": [s.model_dump() for s in strong_candidates], "possible_candidates": [s.model_dump() for s in possible_candidates]}
     with open(DELETION_CANDIDATES_JSON_FILE, "w", encoding="utf-8") as f_json:
         json.dump(candidates_for_json, f_json, indent=2)
-    print(f"{TermColors.STATUS_SUCCESS}Deletion candidates saved to JSON: {DELETION_CANDIDATES_JSON_FILE}{TermColors.RESET}")
+    print(f"{TermColors.STATUS_SUCCESS}Deletion candidates saved to JSON: {os.path.basename(DELETION_CANDIDATES_JSON_FILE)} (in the project directory){TermColors.RESET}")
 
 # --- Main Orchestration ---
 def run_cleanup_planning(gmail_service, openai_client): # Renamed and added parameters
@@ -269,7 +289,7 @@ def run_cleanup_planning(gmail_service, openai_client): # Renamed and added para
     # For now, using fixed values for simplicity in refactoring.
     # Example prompt for days:
     try:
-        days_input = input(f"How many days of older emails to scan (default {days_to_scan_for_old_emails})? Press Enter for default: ")
+        days_input = input(f"Scan emails older than how many days? (default {days_to_scan_for_old_emails})? Press Enter for default: ")
         if days_input.strip():
             days_to_scan_for_old_emails = int(days_input)
         

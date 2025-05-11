@@ -1,6 +1,7 @@
 import os
 import json
 from datetime import datetime, timezone
+import re # For date validation
 
 # Import utilities
 from email_utils import get_gmail_service, TermColors
@@ -28,16 +29,40 @@ def run_archive_unread(gmail_service): # Renamed and added parameter
         print(f"{TermColors.STATUS_ERROR}Gmail service not available for unread archiver. Exiting.{TermColors.RESET}")
         return
 
-    # 1. Find all unread emails
+    # 0. Get cutoff date from user
+    cutoff_date_str = ""
+    cutoff_date_obj = None
+    while True:
+        cutoff_date_str = input(f"{TermColors.YELLOW}Enter cutoff date (YYYY-MM-DD) to archive unread emails older than this date: {TermColors.RESET}").strip()
+        if re.match(r"^\d{4}-\d{2}-\d{2}$", cutoff_date_str):
+            try:
+                cutoff_date_obj = datetime.strptime(cutoff_date_str, "%Y-%m-%d")
+                # Optional: Make it timezone-aware if comparing with email dates directly,
+                # but for Gmail 'before:' query, the string format is usually sufficient.
+                # cutoff_date_obj = cutoff_date_obj.replace(tzinfo=timezone.utc) # Example
+                print(f"{TermColors.STATUS_INFO}Cutoff date set to: {cutoff_date_str}{TermColors.RESET}")
+                break
+            except ValueError:
+                print(f"{TermColors.STATUS_ERROR}Invalid date. Please use YYYY-MM-DD format and ensure it's a real date.{TermColors.RESET}")
+        else:
+            print(f"{TermColors.STATUS_ERROR}Invalid format. Please use YYYY-MM-DD.{TermColors.RESET}")
+
+    # Format date for Gmail query (YYYY/MM/DD)
+    gmail_query_date = cutoff_date_obj.strftime("%Y/%m/%d")
+    
+    # 1. Find all unread emails older than the cutoff date
     unread_message_ids = []
     page_token = None
-    print(f"{TermColors.STATUS_INFO}Searching for all unread emails...{TermColors.RESET}")
+    print(f"{TermColors.STATUS_INFO}Searching for unread emails older than {cutoff_date_str}...{TermColors.RESET}")
+    
+    query_string = f'is:unread in:inbox -in:spam -in:trash before:{gmail_query_date}'
+    print(f"{TermColors.STATUS_INFO}Using Gmail query: {query_string}{TermColors.RESET}")
 
     try:
         while True:
             response = gmail_service.users().messages().list(
                 userId='me',
-                q='is:unread in:inbox -in:spam -in:trash', # Modified query
+                q=query_string,
                 pageToken=page_token,
                 maxResults=500 # Fetch in batches
             ).execute()
